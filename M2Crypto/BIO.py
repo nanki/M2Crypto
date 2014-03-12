@@ -70,8 +70,8 @@ class BIO:
             raise IOError, 'cannot read'
         lines=[]
         while 1:
-            buf=m2.bio_gets(self.bio, 4096)
-            if buf is None:
+            buf = m2.bio_gets(self.bio, 4096)
+            if buf is None or len(buf) == 0:
                 break
             lines.append(buf)
         return lines
@@ -136,10 +136,12 @@ class MemoryBuffer(BIO):
 
     def __init__(self, data=None):
         BIO.__init__(self)
-        self.bio = m2.bio_new(m2.bio_s_mem())
         self._pyfree = 1
-        if data is not None:
-            m2.bio_write(self.bio, data)
+        if data is None:
+            self.bio = m2.bio_new(m2.bio_s_mem())
+        else:
+            self.data = data
+            self.bio = m2.bio_new_mem_buf(data)
 
     def __len__(self):
         return m2.bio_ctrl_pending(self.bio)

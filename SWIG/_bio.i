@@ -138,6 +138,16 @@ int bio_write(BIO *bio, PyObject *from) {
     return ret;
 }
 
+BIO *bio_new_mem_buf(PyObject *data) {
+    const void *fbuf;
+    int flen, ret;
+
+    if (m2_PyObject_AsReadBufferInt(data , &fbuf, &flen) == -1)
+        return -1;
+
+    return BIO_new_mem_buf(fbuf, flen);
+}
+
 /* XXX Casting size_t to int. */
 int bio_ctrl_pending(BIO *bio) {
     return (int)BIO_ctrl_pending(bio);
